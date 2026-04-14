@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Book an appointment — Entheos</title>
+  <meta name="description" content="Book your appointment online">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef7f9', 100: '#d5ecf0', 200: '#a8d8e2', 300: '#72bfcf',
+              400: '#3f9db2', 500: '#2B6777', 600: '#245768', 700: '#1d4553',
+              800: '#17363f', 900: '#0f2530',
+            },
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased min-h-screen">
+
+  <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+    <div class="max-w-2xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+          <rect x="12" y="16" width="76" height="16" rx="8" class="fill-brand-500"/>
+          <rect x="12" y="42" width="56" height="16" rx="8" class="fill-brand-500"/>
+          <rect x="12" y="68" width="76" height="16" rx="8" class="fill-brand-500"/>
+        </svg>
+        <span class="text-lg font-bold tracking-tight text-brand-500">Entheos</span>
+      </a>
+      <span id="business-name-nav" class="text-sm text-gray-500 dark:text-gray-400"></span>
+    </div>
+  </nav>
+
+  <main class="max-w-2xl mx-auto px-6 py-8">
+
+    <!-- LOADING -->
+    <div id="loading" class="text-center py-16">
+      <svg class="animate-spin h-8 w-8 mx-auto text-brand-500" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="mt-4 text-gray-500">Loading…</p>
+    </div>
+
+    <!-- ERROR -->
+    <div id="error" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6 text-center">
+      <svg class="w-12 h-12 mx-auto text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+      <h2 class="mt-4 text-lg font-semibold text-red-700 dark:text-red-400">This booking link is no longer active</h2>
+      <p id="error-message" class="mt-2 text-sm text-red-600 dark:text-red-400">Please contact the business directly.</p>
+    </div>
+
+    <!-- BOOKING CONTAINER -->
+    <div id="booking" class="hidden">
+      <!-- Progress -->
+      <div class="mb-6">
+        <div class="flex items-center gap-2 text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+          <span id="step-label">Step 1 of 4</span>
+          <span class="flex-1"></span>
+          <span id="step-title" class="text-brand-500 font-semibold">Select a service</span>
+        </div>
+        <div class="h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full overflow-hidden">
+          <div id="step-progress" class="h-full bg-brand-500 transition-all duration-300" style="width: 25%"></div>
+        </div>
+      </div>
+
+      <!-- Business header -->
+      <div class="mb-6">
+        <h1 id="business-name" class="text-2xl font-bold tracking-tight"></h1>
+        <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Book an appointment online</p>
+      </div>
+
+      <!-- STEP 1: SERVICE -->
+      <section id="step-service" class="step">
+        <div id="services-list" class="space-y-3"></div>
+      </section>
+
+      <!-- STEP 2: DATE -->
+      <section id="step-date" class="step hidden">
+        <button data-back class="mb-4 inline-flex items-center gap-1 text-sm text-brand-500 font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          Change service
+        </button>
+        <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-200 dark:border-gray-800">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Selected:</p>
+          <p id="selected-service-summary" class="font-semibold"></p>
+        </div>
+        <h2 class="mt-6 mb-3 text-lg font-semibold">Pick a date</h2>
+        <div id="dates-list" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
+      </section>
+
+      <!-- STEP 3: TIME -->
+      <section id="step-time" class="step hidden">
+        <button data-back class="mb-4 inline-flex items-center gap-1 text-sm text-brand-500 font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          Change date
+        </button>
+        <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-200 dark:border-gray-800">
+          <p class="text-sm text-gray-500 dark:text-gray-400 mb-1">Selected:</p>
+          <p class="font-semibold"><span id="summary-service"></span></p>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mt-1"><span id="summary-date"></span></p>
+        </div>
+        <h2 class="mt-6 mb-3 text-lg font-semibold">Pick a time</h2>
+        <div id="times-loading" class="text-center py-8 hidden">
+          <svg class="animate-spin h-6 w-6 mx-auto text-brand-500" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+        <div id="times-empty" class="hidden text-center py-8 text-gray-500 dark:text-gray-400 text-sm">
+          No availability on this day. Please pick another.
+        </div>
+        <div id="times-list" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
+      </section>
+
+      <!-- STEP 4: CONTACT -->
+      <section id="step-contact" class="step hidden">
+        <button data-back class="mb-4 inline-flex items-center gap-1 text-sm text-brand-500 font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+          Change time
+        </button>
+        <div class="bg-white dark:bg-gray-900 rounded-2xl p-4 border border-gray-200 dark:border-gray-800">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center">
+              <svg class="w-5 h-5 text-brand-600 dark:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </div>
+            <div class="flex-1">
+              <p class="font-semibold text-sm"><span id="confirm-service"></span></p>
+              <p class="text-xs text-gray-500 dark:text-gray-400"><span id="confirm-datetime"></span></p>
+            </div>
+          </div>
+        </div>
+        <h2 class="mt-6 mb-3 text-lg font-semibold">Your details</h2>
+        <form id="contact-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Full name <span class="text-red-500">*</span></label>
+            <input id="contact-name" type="text" required class="w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone <span class="text-red-500">*</span></label>
+            <input id="contact-phone" type="tel" required class="w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email <span class="text-gray-400 text-xs">(optional)</span></label>
+            <input id="contact-email" type="email" class="w-full px-4 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent">
+          </div>
+          <button type="submit" id="submit-btn" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            <span id="submit-label">Confirm booking</span>
+          </button>
+          <p id="submit-error" class="hidden text-sm text-red-600 dark:text-red-400 text-center"></p>
+        </form>
+      </section>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="success" class="hidden bg-white dark:bg-gray-900 rounded-2xl p-8 text-center border border-gray-200 dark:border-gray-800">
+      <div class="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+        <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h2 class="mt-4 text-xl font-bold">You're booked!</h2>
+      <p class="mt-2 text-gray-600 dark:text-gray-400">
+        <span id="success-service" class="font-semibold"></span><br>
+        <span id="success-datetime"></span>
+      </p>
+      <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+        You'll hear from <span id="success-biz" class="font-semibold"></span> to confirm.
+      </p>
+    </div>
+  </main>
+
+  <script>
+    // ──────────────────────────────────────────────────────────
+    // Configuration
+    // ──────────────────────────────────────────────────────────
+    const SUPABASE_URL = 'https://db.entheosapp.ca';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJyb2xlIjogImFub24iLCAiaXNzIjogInN1cGFiYXNlIiwgImlhdCI6IDE3NzUwOTU0NTcsICJleHAiOiAyMDkwNDU1NDU3fQ.ZWUzB785p8R-U1eblh2-ewArusRzCKwapJCwSxCTYSM';
+    const HEADERS = {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      'Accept-Profile': 'atheos',
+    };
+
+    const SLOT_INCREMENT_MIN = 15;
+    const BOOKING_WINDOW_DAYS = 30;
+
+    // ──────────────────────────────────────────────────────────
+    // State
+    // ──────────────────────────────────────────────────────────
+    const state = {
+      token: null,
+      business: null,
+      categories: [],
+      services: [],
+      businessHours: null,
+      bufferMinutes: 0,
+      // selections
+      service: null,
+      date: null,  // Date at midnight
+      time: null,  // Date at the selected time
+    };
+
+    // ──────────────────────────────────────────────────────────
+    // Helpers
+    // ──────────────────────────────────────────────────────────
+    const $ = id => document.getElementById(id);
+    const show = (id) => $(id).classList.remove('hidden');
+    const hide = (id) => $(id).classList.add('hidden');
+
+    function fmtMoney(cents) {
+      return '$' + (cents / 100).toFixed(2);
+    }
+    function fmtDuration(min) {
+      if (min >= 60) {
+        const h = Math.floor(min / 60);
+        const m = min % 60;
+        return m ? `${h}h ${m}m` : `${h}h`;
+      }
+      return `${min} min`;
+    }
+    function fmtDate(date) {
+      return date.toLocaleDateString(undefined, {
+        weekday: 'short', month: 'short', day: 'numeric',
+      });
+    }
+    function fmtTime(date) {
+      return date.toLocaleTimeString(undefined, {
+        hour: 'numeric', minute: '2-digit', hour12: true,
+      });
+    }
+    function dayKey(date) {
+      return ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][date.getDay()];
+    }
+    function parseHHMM(s) {
+      const [h, m] = s.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function showError(msg) {
+      hide('loading');
+      hide('booking');
+      show('error');
+      if (msg) $('error-message').textContent = msg;
+    }
+
+    function setStep(n) {
+      const titles = ['Select a service', 'Pick a date', 'Pick a time', 'Your details'];
+      $('step-label').textContent = `Step ${n} of 4`;
+      $('step-title').textContent = titles[n - 1];
+      $('step-progress').style.width = `${n * 25}%`;
+      for (const el of document.querySelectorAll('.step')) el.classList.add('hidden');
+      const map = ['step-service','step-date','step-time','step-contact'];
+      show(map[n - 1]);
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Data loading
+    // ──────────────────────────────────────────────────────────
+    async function loadBusiness() {
+      const url = `${SUPABASE_URL}/rest/v1/businesses` +
+        `?booking_token=eq.${encodeURIComponent(state.token)}` +
+        `&booking_enabled=eq.true` +
+        `&select=id,name,business_hours_json,buffer_minutes,booking_token,booking_enabled`;
+      const res = await fetch(url, { headers: HEADERS });
+      if (!res.ok) throw new Error(`business fetch failed: ${res.status}`);
+      const rows = await res.json();
+      if (!rows.length) return null;
+      return rows[0];
+    }
+
+    async function loadServicesAndCategories(businessId) {
+      const cUrl = `${SUPABASE_URL}/rest/v1/service_categories` +
+        `?business_id=eq.${businessId}&order=sort_order.asc&select=id,name,sort_order`;
+      const sUrl = `${SUPABASE_URL}/rest/v1/services` +
+        `?business_id=eq.${businessId}&order=name.asc` +
+        `&select=id,category_id,name,description,default_duration_minutes,default_price_cents`;
+      const [cRes, sRes] = await Promise.all([
+        fetch(cUrl, { headers: HEADERS }),
+        fetch(sUrl, { headers: HEADERS }),
+      ]);
+      state.categories = await cRes.json();
+      state.services = await sRes.json();
+    }
+
+    async function loadAppointments(businessId, fromIso, toIso) {
+      const url = `${SUPABASE_URL}/rest/v1/appointments` +
+        `?business_id=eq.${businessId}` +
+        `&start_time=gte.${encodeURIComponent(fromIso)}` +
+        `&start_time=lt.${encodeURIComponent(toIso)}` +
+        `&select=start_time,end_time,status`;
+      const res = await fetch(url, { headers: HEADERS });
+      if (!res.ok) throw new Error(`appointments fetch failed: ${res.status}`);
+      return res.json();
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Step 1 — services
+    // ──────────────────────────────────────────────────────────
+    function renderServices() {
+      const container = $('services-list');
+      if (!state.services.length) {
+        container.innerHTML =
+          '<p class="text-center text-gray-500 py-8">No services available to book right now.</p>';
+        return;
+      }
+
+      // Group by category
+      const uncategorized = [];
+      const byCat = new Map();
+      for (const s of state.services) {
+        if (s.category_id) {
+          if (!byCat.has(s.category_id)) byCat.set(s.category_id, []);
+          byCat.get(s.category_id).push(s);
+        } else {
+          uncategorized.push(s);
+        }
+      }
+
+      const html = [];
+      for (const cat of state.categories) {
+        const svcs = byCat.get(cat.id);
+        if (!svcs || !svcs.length) continue;
+        html.push(`<h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-4 mb-2">${cat.name}</h3>`);
+        html.push(...svcs.map(svcCard));
+      }
+      if (uncategorized.length) {
+        html.push(`<h3 class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mt-4 mb-2">Other</h3>`);
+        html.push(...uncategorized.map(svcCard));
+      }
+      container.innerHTML = html.join('');
+
+      container.querySelectorAll('[data-service-id]').forEach(el => {
+        el.addEventListener('click', () => {
+          const svc = state.services.find(s => s.id === el.dataset.serviceId);
+          if (svc) selectService(svc);
+        });
+      });
+    }
+
+    function svcCard(s) {
+      const desc = s.description ? `<p class="text-xs text-gray-500 dark:text-gray-400 mt-1">${escapeHtml(s.description)}</p>` : '';
+      return `
+        <button data-service-id="${s.id}" class="w-full text-left bg-white dark:bg-gray-900 hover:border-brand-400 dark:hover:border-brand-400 border border-gray-200 dark:border-gray-800 rounded-2xl p-4 transition-colors">
+          <div class="flex items-start gap-3">
+            <div class="flex-1">
+              <p class="font-semibold">${escapeHtml(s.name)}</p>
+              ${desc}
+              <p class="text-xs text-gray-500 dark:text-gray-400 mt-1.5">${fmtDuration(s.default_duration_minutes)}</p>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="font-semibold text-brand-600 dark:text-brand-300">${fmtMoney(s.default_price_cents)}</p>
+            </div>
+          </div>
+        </button>`;
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, ch => ({
+        '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+      }[ch]));
+    }
+
+    function selectService(s) {
+      state.service = s;
+      $('selected-service-summary').textContent =
+        `${s.name} · ${fmtDuration(s.default_duration_minutes)} · ${fmtMoney(s.default_price_cents)}`;
+      renderDates();
+      setStep(2);
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Step 2 — dates
+    // ──────────────────────────────────────────────────────────
+    function renderDates() {
+      const container = $('dates-list');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const html = [];
+
+      for (let i = 0; i < BOOKING_WINDOW_DAYS; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        const k = dayKey(d);
+        const day = state.businessHours?.[k];
+        const isOpen = day && day.open && day.close;
+        const disabled = !isOpen;
+        const label = d.toLocaleDateString(undefined, { weekday: 'short' });
+        const num = d.getDate();
+        html.push(`
+          <button data-iso="${d.toISOString()}" ${disabled ? 'disabled' : ''}
+            class="py-3 rounded-xl border transition-colors ${disabled
+              ? 'border-gray-200 dark:border-gray-800 text-gray-300 dark:text-gray-700 cursor-not-allowed'
+              : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand-400'}">
+            <div class="text-xs font-medium ${disabled ? '' : 'text-gray-500 dark:text-gray-400'}">${label}</div>
+            <div class="text-lg font-bold mt-0.5">${num}</div>
+          </button>
+        `);
+      }
+      container.innerHTML = html.join('');
+      container.querySelectorAll('[data-iso]:not([disabled])').forEach(el => {
+        el.addEventListener('click', () => selectDate(new Date(el.dataset.iso)));
+      });
+    }
+
+    async function selectDate(date) {
+      state.date = date;
+      $('summary-service').textContent =
+        `${state.service.name} · ${fmtDuration(state.service.default_duration_minutes)} · ${fmtMoney(state.service.default_price_cents)}`;
+      $('summary-date').textContent = date.toLocaleDateString(undefined, {
+        weekday: 'long', month: 'long', day: 'numeric',
+      });
+      setStep(3);
+      await renderTimes();
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Step 3 — times
+    // ──────────────────────────────────────────────────────────
+    async function renderTimes() {
+      show('times-loading');
+      hide('times-empty');
+      $('times-list').innerHTML = '';
+
+      const day = state.businessHours[dayKey(state.date)];
+      const openMin = parseHHMM(day.open);
+      const closeMin = parseHHMM(day.close);
+      const durationMin = state.service.default_duration_minutes;
+      const buffer = state.bufferMinutes;
+
+      // Fetch existing appointments for this day (non-cancelled).
+      const dayStart = new Date(state.date);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(dayStart);
+      dayEnd.setDate(dayEnd.getDate() + 1);
+      let appts = [];
+      try {
+        appts = await loadAppointments(
+          state.business.id,
+          dayStart.toISOString(),
+          dayEnd.toISOString(),
+        );
+      } catch (e) {
+        // Soft-fail: if appointments can't be fetched, still offer slots.
+        console.warn('Could not load appointments', e);
+      }
+
+      const apptRanges = appts.map(a => ({
+        start: new Date(a.start_time).getTime(),
+        end: new Date(a.end_time).getTime(),
+      }));
+
+      const slots = [];
+      const now = Date.now();
+      for (let m = openMin; m + durationMin <= closeMin; m += SLOT_INCREMENT_MIN) {
+        const start = new Date(dayStart);
+        start.setMinutes(m);
+        const startMs = start.getTime();
+        const endMs = startMs + durationMin * 60_000;
+
+        if (startMs <= now) continue; // past
+
+        // Check overlap with any existing appt (with buffer on both sides)
+        const bufferMs = buffer * 60_000;
+        const overlaps = apptRanges.some(r =>
+          startMs < r.end + bufferMs && endMs + bufferMs > r.start
+        );
+        if (overlaps) continue;
+
+        slots.push(start);
+      }
+
+      hide('times-loading');
+      const list = $('times-list');
+      if (!slots.length) {
+        show('times-empty');
+        return;
+      }
+      list.innerHTML = slots.map(s => `
+        <button data-iso="${s.toISOString()}"
+          class="py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand-400 text-sm font-medium">
+          ${fmtTime(s)}
+        </button>
+      `).join('');
+      list.querySelectorAll('[data-iso]').forEach(el => {
+        el.addEventListener('click', () => selectTime(new Date(el.dataset.iso)));
+      });
+    }
+
+    function selectTime(time) {
+      state.time = time;
+      const svc = state.service;
+      $('confirm-service').textContent =
+        `${svc.name} · ${fmtDuration(svc.default_duration_minutes)} · ${fmtMoney(svc.default_price_cents)}`;
+      $('confirm-datetime').textContent =
+        time.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })
+        + ' at ' + fmtTime(time);
+      setStep(4);
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Step 4 — submit
+    // ──────────────────────────────────────────────────────────
+    async function onSubmit(event) {
+      event.preventDefault();
+      const btn = $('submit-btn');
+      btn.disabled = true;
+      $('submit-label').textContent = 'Booking…';
+      hide('submit-error');
+
+      const fullName = $('contact-name').value.trim();
+      const phone = $('contact-phone').value.trim();
+      const email = $('contact-email').value.trim() || null;
+
+      const [firstName, ...rest] = fullName.split(' ');
+      const lastName = rest.length ? rest.join(' ') : null;
+
+      const now = new Date().toISOString();
+      const clientId = crypto.randomUUID();
+      const apptId = crypto.randomUUID();
+      const apptSvcId = crypto.randomUUID();
+
+      const startIso = state.time.toISOString();
+      const endMs = state.time.getTime() + state.service.default_duration_minutes * 60_000;
+      const endIso = new Date(endMs).toISOString();
+
+      try {
+        // 1. Client
+        await postJson('/rest/v1/clients', {
+          id: clientId,
+          business_id: state.business.id,
+          first_name: firstName,
+          last_name: lastName,
+          phone,
+          email,
+          preferred_contact_method: 'phone',
+          created_at: now,
+          updated_at: now,
+        });
+
+        // 2. Appointment
+        await postJson('/rest/v1/appointments', {
+          id: apptId,
+          business_id: state.business.id,
+          client_id: clientId,
+          start_time: startIso,
+          end_time: endIso,
+          status: 'booked',
+          notes: 'Booked via public booking page',
+          is_walk_in: false,
+          is_block_time: false,
+          created_at: now,
+          updated_at: now,
+        });
+
+        // 3. Appointment service
+        await postJson('/rest/v1/appointment_services', {
+          id: apptSvcId,
+          appointment_id: apptId,
+          service_id: state.service.id,
+          service_name_snapshot: state.service.name,
+          price_cents: state.service.default_price_cents,
+          duration_minutes: state.service.default_duration_minutes,
+          gst_rate: 0,
+          pst_rate: 0,
+          created_at: now,
+          updated_at: now,
+        });
+
+        // Show success
+        $('success-service').textContent = state.service.name;
+        $('success-datetime').textContent =
+          state.time.toLocaleDateString(undefined, {
+            weekday: 'long', month: 'long', day: 'numeric',
+          }) + ' at ' + fmtTime(state.time);
+        $('success-biz').textContent = state.business.name;
+        hide('booking');
+        show('success');
+      } catch (e) {
+        console.error(e);
+        btn.disabled = false;
+        $('submit-label').textContent = 'Confirm booking';
+        $('submit-error').textContent =
+          'Sorry, something went wrong. The slot may have just been taken — try picking another.';
+        show('submit-error');
+      }
+    }
+
+    async function postJson(path, body) {
+      const res = await fetch(SUPABASE_URL + path, {
+        method: 'POST',
+        headers: {
+          ...HEADERS,
+          'Content-Type': 'application/json',
+          'Content-Profile': 'atheos',
+          Prefer: 'return=minimal',
+        },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`POST ${path} ${res.status}: ${text}`);
+      }
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Boot
+    // ──────────────────────────────────────────────────────────
+    async function boot() {
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      state.token = parts[1] || ''; // /book/{token}
+      if (!state.token) {
+        showError('No booking token in the URL.');
+        return;
+      }
+
+      try {
+        const biz = await loadBusiness();
+        if (!biz) {
+          showError('This booking link is no longer active.');
+          return;
+        }
+        state.business = biz;
+        state.bufferMinutes = biz.buffer_minutes || 0;
+
+        try {
+          state.businessHours = biz.business_hours_json
+            ? JSON.parse(biz.business_hours_json)
+            : {};
+        } catch (_) {
+          state.businessHours = {};
+        }
+
+        await loadServicesAndCategories(biz.id);
+
+        $('business-name').textContent = biz.name;
+        $('business-name-nav').textContent = biz.name;
+        document.title = `Book with ${biz.name} — Entheos`;
+
+        renderServices();
+
+        hide('loading');
+        show('booking');
+        setStep(1);
+
+        // Back buttons
+        document.querySelectorAll('[data-back]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const current = [...document.querySelectorAll('.step')]
+              .findIndex(el => !el.classList.contains('hidden'));
+            if (current > 0) setStep(current); // setStep is 1-indexed, so step N = index N-1 → go back to N
+          });
+        });
+
+        $('contact-form').addEventListener('submit', onSubmit);
+      } catch (e) {
+        console.error(e);
+        showError('Something went wrong loading this page.');
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>
