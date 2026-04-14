@@ -167,20 +167,48 @@
     </div>
 
     <!-- SUCCESS -->
-    <div id="success" class="hidden bg-white dark:bg-gray-900 rounded-2xl p-8 text-center border border-gray-200 dark:border-gray-800">
-      <div class="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-        <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
+    <div id="success" class="hidden bg-white dark:bg-gray-900 rounded-2xl p-8 border border-gray-200 dark:border-gray-800">
+      <div class="text-center">
+        <div class="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+          <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        </div>
+        <h2 class="mt-4 text-xl font-bold">You're booked!</h2>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">
+          <span id="success-service" class="font-semibold"></span><br>
+          <span id="success-datetime"></span>
+        </p>
+        <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+          You'll hear from <span id="success-biz" class="font-semibold"></span> to confirm.
+        </p>
       </div>
-      <h2 class="mt-4 text-xl font-bold">You're booked!</h2>
-      <p class="mt-2 text-gray-600 dark:text-gray-400">
-        <span id="success-service" class="font-semibold"></span><br>
-        <span id="success-datetime"></span>
-      </p>
-      <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
-        You'll hear from <span id="success-biz" class="font-semibold"></span> to confirm.
-      </p>
+
+      <!-- Manage link -->
+      <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
+        <p class="text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-2">
+          Need to change or cancel?
+        </p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+          Save this link — you can reschedule or cancel anytime:
+        </p>
+        <div class="flex gap-2">
+          <input id="manage-link" readonly
+            class="flex-1 px-3 py-2 text-xs font-mono bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg"
+            onclick="this.select()">
+          <button id="copy-link-btn" onclick="copyManageLink()"
+            class="px-3 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium rounded-lg transition-colors">
+            Copy
+          </button>
+        </div>
+        <a id="manage-open-btn" href="#" target="_blank" rel="noopener"
+          class="mt-2 inline-flex items-center gap-1 text-sm text-brand-500 hover:text-brand-600 font-medium">
+          Open booking
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+        </a>
+      </div>
     </div>
   </main>
 
@@ -375,6 +403,16 @@
       }[ch]));
     }
 
+    /// 16-char URL-safe token for the client portal link.
+    function generateClientToken() {
+      const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      const bytes = new Uint8Array(16);
+      crypto.getRandomValues(bytes);
+      let s = '';
+      for (const b of bytes) s += chars[b % chars.length];
+      return s;
+    }
+
     function selectService(s) {
       state.service = s;
       $('selected-service-summary').textContent =
@@ -533,6 +571,7 @@
       const clientId = crypto.randomUUID();
       const apptId = crypto.randomUUID();
       const apptSvcId = crypto.randomUUID();
+      const clientToken = generateClientToken();
 
       const startIso = state.time.toISOString();
       const endMs = state.time.getTime() + state.service.default_duration_minutes * 60_000;
@@ -563,6 +602,7 @@
           notes: 'Booked via public booking page',
           is_walk_in: false,
           is_block_time: false,
+          client_token: clientToken,
           created_at: now,
           updated_at: now,
         });
@@ -588,6 +628,9 @@
             weekday: 'long', month: 'long', day: 'numeric',
           }) + ' at ' + fmtTime(state.time);
         $('success-biz').textContent = state.business.name;
+        const manageUrl = `${window.location.origin}/my/${clientToken}`;
+        $('manage-link').value = manageUrl;
+        $('manage-open-btn').href = manageUrl;
         hide('booking');
         show('success');
       } catch (e) {
@@ -672,6 +715,21 @@
         showError('Something went wrong loading this page.');
       }
     }
+
+    // Global helper for the success screen's Copy button.
+    window.copyManageLink = async function() {
+      const input = document.getElementById('manage-link');
+      try {
+        await navigator.clipboard.writeText(input.value);
+      } catch (_) {
+        input.select();
+        document.execCommand('copy');
+      }
+      const btn = document.getElementById('copy-link-btn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => { btn.textContent = original; }, 1500);
+    };
 
     boot();
   </script>

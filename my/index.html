@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage booking — Entheos</title>
+  <meta name="description" content="View, reschedule, or cancel your booking">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef7f9', 100: '#d5ecf0', 200: '#a8d8e2', 300: '#72bfcf',
+              400: '#3f9db2', 500: '#2B6777', 600: '#245768', 700: '#1d4553',
+              800: '#17363f', 900: '#0f2530',
+            },
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased min-h-screen">
+
+  <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+    <div class="max-w-2xl mx-auto px-6 h-16 flex items-center">
+      <a href="/" class="flex items-center gap-3">
+        <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+          <rect x="12" y="16" width="76" height="16" rx="8" class="fill-brand-500"/>
+          <rect x="12" y="42" width="56" height="16" rx="8" class="fill-brand-500"/>
+          <rect x="12" y="68" width="76" height="16" rx="8" class="fill-brand-500"/>
+        </svg>
+        <span class="text-lg font-bold tracking-tight text-brand-500">Entheos</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="max-w-2xl mx-auto px-6 py-8">
+
+    <!-- LOADING -->
+    <div id="loading" class="text-center py-16">
+      <svg class="animate-spin h-8 w-8 mx-auto text-brand-500" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+    </div>
+
+    <!-- ERROR -->
+    <div id="error" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6 text-center">
+      <svg class="w-12 h-12 mx-auto text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+      <h2 class="mt-4 text-lg font-semibold text-red-700 dark:text-red-400">Booking not found</h2>
+      <p id="error-message" class="mt-2 text-sm text-red-600 dark:text-red-400">Check the link or contact the business directly.</p>
+    </div>
+
+    <!-- VIEW -->
+    <div id="view" class="hidden">
+      <div class="bg-white dark:bg-gray-900 rounded-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+        <!-- Status banner -->
+        <div id="status-banner" class="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          <div id="status-badge" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider"></div>
+        </div>
+
+        <div class="px-6 py-6">
+          <h1 class="text-xl font-bold" id="service-name"></h1>
+          <p id="business-name" class="mt-0.5 text-sm text-gray-500 dark:text-gray-400"></p>
+
+          <div class="mt-6 space-y-3">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-brand-600 dark:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">Date & time</p>
+                <p class="font-semibold"><span id="appt-date"></span></p>
+                <p class="text-sm text-gray-600 dark:text-gray-400"><span id="appt-time"></span></p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-brand-600 dark:text-brand-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider font-bold">Price</p>
+                <p class="font-semibold" id="appt-price"></p>
+                <p class="text-sm text-gray-600 dark:text-gray-400" id="appt-duration"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div id="actions" class="px-6 py-4 bg-gray-50 dark:bg-gray-950/50 border-t border-gray-200 dark:border-gray-800 flex gap-3">
+          <button id="reschedule-btn" class="flex-1 py-2.5 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 hover:border-brand-400 text-sm font-semibold rounded-xl transition-colors">
+            Reschedule
+          </button>
+          <button id="cancel-btn" class="flex-1 py-2.5 bg-white dark:bg-gray-900 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 text-sm font-semibold rounded-xl transition-colors">
+            Cancel booking
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESCHEDULE -->
+    <div id="reschedule" class="hidden">
+      <button onclick="showView()" class="mb-4 inline-flex items-center gap-1 text-sm text-brand-500 font-medium">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Back
+      </button>
+      <h1 class="text-xl font-bold mb-1">Reschedule your booking</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Pick a new date and time.</p>
+
+      <h2 class="mb-2 text-sm font-semibold">New date</h2>
+      <div id="reschedule-dates" class="grid grid-cols-3 sm:grid-cols-4 gap-2 mb-6"></div>
+
+      <div id="reschedule-times-section" class="hidden">
+        <h2 class="mb-2 text-sm font-semibold">New time</h2>
+        <div id="reschedule-times-loading" class="text-center py-4 hidden">
+          <svg class="animate-spin h-6 w-6 mx-auto text-brand-500" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </div>
+        <div id="reschedule-times-empty" class="hidden text-sm text-gray-500 py-4">No availability on this day.</div>
+        <div id="reschedule-times" class="grid grid-cols-3 sm:grid-cols-4 gap-2"></div>
+      </div>
+    </div>
+
+    <!-- CANCELLED STATE -->
+    <div id="cancelled" class="hidden bg-white dark:bg-gray-900 rounded-2xl p-8 text-center border border-gray-200 dark:border-gray-800">
+      <div class="w-16 h-16 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+        <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </div>
+      <h2 class="mt-4 text-xl font-bold">Booking cancelled</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400" id="cancelled-detail"></p>
+    </div>
+
+    <!-- RESCHEDULED CONFIRMATION -->
+    <div id="rescheduled" class="hidden bg-white dark:bg-gray-900 rounded-2xl p-8 text-center border border-gray-200 dark:border-gray-800">
+      <div class="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+        <svg class="w-8 h-8 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h2 class="mt-4 text-xl font-bold">Rescheduled!</h2>
+      <p class="mt-2 text-sm text-gray-600 dark:text-gray-400" id="rescheduled-detail"></p>
+      <button onclick="location.reload()" class="mt-6 inline-flex px-4 py-2 bg-brand-500 text-white text-sm font-semibold rounded-xl hover:bg-brand-600">
+        View updated booking
+      </button>
+    </div>
+  </main>
+
+  <script>
+    // ──────────────────────────────────────────────────────────
+    // Configuration
+    // ──────────────────────────────────────────────────────────
+    const SUPABASE_URL = 'https://db.entheosapp.ca';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJyb2xlIjogImFub24iLCAiaXNzIjogInN1cGFiYXNlIiwgImlhdCI6IDE3NzUwOTU0NTcsICJleHAiOiAyMDkwNDU1NDU3fQ.ZWUzB785p8R-U1eblh2-ewArusRzCKwapJCwSxCTYSM';
+    const HEADERS = {
+      apikey: SUPABASE_ANON_KEY,
+      Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+      'Accept-Profile': 'atheos',
+    };
+
+    const SLOT_INCREMENT_MIN = 15;
+    const BOOKING_WINDOW_DAYS = 30;
+
+    // ──────────────────────────────────────────────────────────
+    // State
+    // ──────────────────────────────────────────────────────────
+    const state = {
+      token: null,
+      appointment: null,
+      apptService: null,  // the single AppointmentService row
+      business: null,
+      newDate: null,
+    };
+
+    const $ = id => document.getElementById(id);
+    const show = (id) => $(id).classList.remove('hidden');
+    const hide = (id) => $(id).classList.add('hidden');
+
+    function fmtMoney(cents) { return '$' + (cents / 100).toFixed(2); }
+    function fmtDuration(min) {
+      if (min >= 60) {
+        const h = Math.floor(min / 60);
+        const m = min % 60;
+        return m ? `${h}h ${m}m` : `${h}h`;
+      }
+      return `${min} min`;
+    }
+    function fmtDate(d) {
+      return d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+    }
+    function fmtTime(d) {
+      return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+    function dayKey(d) {
+      return ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'][d.getDay()];
+    }
+    function parseHHMM(s) {
+      const [h, m] = s.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function showError(msg) {
+      hide('loading'); hide('view'); hide('reschedule');
+      show('error');
+      if (msg) $('error-message').textContent = msg;
+    }
+
+    window.showView = function() {
+      hide('reschedule'); hide('cancelled'); hide('rescheduled');
+      show('view');
+    };
+
+    // ──────────────────────────────────────────────────────────
+    // Data loading
+    // ──────────────────────────────────────────────────────────
+    async function loadAppointment() {
+      const url = `${SUPABASE_URL}/rest/v1/appointments` +
+        `?client_token=eq.${encodeURIComponent(state.token)}` +
+        `&select=id,business_id,client_id,start_time,end_time,status,notes,client_token`;
+      const res = await fetch(url, { headers: HEADERS });
+      if (!res.ok) throw new Error(`appointment fetch failed: ${res.status}`);
+      const rows = await res.json();
+      return rows[0] || null;
+    }
+
+    async function loadApptServices(apptId) {
+      const url = `${SUPABASE_URL}/rest/v1/appointment_services` +
+        `?appointment_id=eq.${apptId}` +
+        `&select=service_name_snapshot,price_cents,duration_minutes`;
+      const res = await fetch(url, { headers: HEADERS });
+      if (!res.ok) return [];
+      return res.json();
+    }
+
+    async function loadBusiness(businessId) {
+      const url = `${SUPABASE_URL}/rest/v1/businesses` +
+        `?id=eq.${businessId}` +
+        `&select=id,name,business_hours_json,buffer_minutes,booking_enabled`;
+      const res = await fetch(url, { headers: HEADERS });
+      if (!res.ok) return null;
+      const rows = await res.json();
+      return rows[0] || null;
+    }
+
+    async function loadAppointments(businessId, fromIso, toIso) {
+      const url = `${SUPABASE_URL}/rest/v1/appointments` +
+        `?business_id=eq.${businessId}` +
+        `&start_time=gte.${encodeURIComponent(fromIso)}` +
+        `&start_time=lt.${encodeURIComponent(toIso)}` +
+        `&select=id,start_time,end_time,status`;
+      const res = await fetch(url, { headers: HEADERS });
+      if (!res.ok) return [];
+      return res.json();
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Render
+    // ──────────────────────────────────────────────────────────
+    function renderAppointment() {
+      const a = state.appointment;
+      const s = state.apptService;
+      const startTime = new Date(a.start_time);
+
+      // Status banner
+      const status = a.status;
+      const statusConfig = {
+        booked: { label: 'Booked', bg: 'bg-blue-100 dark:bg-blue-900/30', fg: 'text-blue-700 dark:text-blue-300', icon: '●' },
+        confirmed: { label: 'Confirmed', bg: 'bg-green-100 dark:bg-green-900/30', fg: 'text-green-700 dark:text-green-300', icon: '✓' },
+        in_progress: { label: 'In progress', bg: 'bg-amber-100 dark:bg-amber-900/30', fg: 'text-amber-700 dark:text-amber-300', icon: '●' },
+        completed: { label: 'Completed', bg: 'bg-gray-100 dark:bg-gray-800', fg: 'text-gray-700 dark:text-gray-300', icon: '✓' },
+        cancelled: { label: 'Cancelled', bg: 'bg-red-100 dark:bg-red-900/30', fg: 'text-red-700 dark:text-red-300', icon: '✕' },
+        no_show: { label: 'No show', bg: 'bg-red-100 dark:bg-red-900/30', fg: 'text-red-700 dark:text-red-300', icon: '✕' },
+      };
+      const conf = statusConfig[status] || statusConfig.booked;
+      const badge = $('status-badge');
+      badge.className = `inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold uppercase tracking-wider ${conf.bg} ${conf.fg}`;
+      badge.innerHTML = `<span>${conf.icon}</span>${conf.label}`;
+
+      $('service-name').textContent = s ? s.service_name_snapshot : 'Appointment';
+      $('business-name').textContent = state.business.name;
+      $('appt-date').textContent = fmtDate(startTime);
+      $('appt-time').textContent = fmtTime(startTime) + ' · ' + fmtDuration(s?.duration_minutes || 0);
+      $('appt-price').textContent = s ? fmtMoney(s.price_cents) : '—';
+      $('appt-duration').textContent = s ? fmtDuration(s.duration_minutes) : '';
+
+      // Hide actions if past, cancelled, completed, or no_show
+      const now = Date.now();
+      const canModify = startTime.getTime() > now
+        && ['booked', 'confirmed'].includes(status);
+      if (canModify) {
+        show('actions');
+      } else {
+        hide('actions');
+      }
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Cancel
+    // ──────────────────────────────────────────────────────────
+    async function onCancel() {
+      if (!confirm('Cancel this booking?\n\nThis cannot be undone from here. If you change your mind, you\'ll need to book again.')) {
+        return;
+      }
+
+      const url = `${SUPABASE_URL}/rest/v1/appointments` +
+        `?client_token=eq.${encodeURIComponent(state.token)}`;
+      const res = await fetch(url, {
+        method: 'PATCH',
+        headers: { ...HEADERS, 'Content-Type': 'application/json', 'Content-Profile': 'atheos', Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          status: 'cancelled',
+          updated_at: new Date().toISOString(),
+        }),
+      });
+
+      if (!res.ok) {
+        alert('Could not cancel — please try again or contact the business.');
+        return;
+      }
+
+      const a = state.appointment;
+      const s = state.apptService;
+      const startTime = new Date(a.start_time);
+      $('cancelled-detail').textContent =
+        `${s?.service_name_snapshot || 'Your appointment'} on ${fmtDate(startTime)} at ${fmtTime(startTime)} has been cancelled.`;
+      hide('view'); hide('reschedule');
+      show('cancelled');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Reschedule
+    // ──────────────────────────────────────────────────────────
+    function showReschedule() {
+      hide('view');
+      show('reschedule');
+      renderDates();
+    }
+
+    function renderDates() {
+      const container = $('reschedule-dates');
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const hours = state.business.business_hours_json
+        ? JSON.parse(state.business.business_hours_json)
+        : {};
+
+      const html = [];
+      for (let i = 0; i < BOOKING_WINDOW_DAYS; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        const k = dayKey(d);
+        const day = hours[k];
+        const isOpen = day && day.open && day.close;
+        const disabled = !isOpen;
+        const label = d.toLocaleDateString(undefined, { weekday: 'short' });
+        const num = d.getDate();
+        html.push(`
+          <button data-iso="${d.toISOString()}" ${disabled ? 'disabled' : ''}
+            class="py-3 rounded-xl border transition-colors ${disabled
+              ? 'border-gray-200 dark:border-gray-800 text-gray-300 dark:text-gray-700 cursor-not-allowed'
+              : 'border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand-400'}">
+            <div class="text-xs font-medium ${disabled ? '' : 'text-gray-500 dark:text-gray-400'}">${label}</div>
+            <div class="text-lg font-bold mt-0.5">${num}</div>
+          </button>
+        `);
+      }
+      container.innerHTML = html.join('');
+      container.querySelectorAll('[data-iso]:not([disabled])').forEach(el => {
+        el.addEventListener('click', async () => {
+          container.querySelectorAll('[data-iso]').forEach(b =>
+            b.classList.remove('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20'));
+          el.classList.add('border-brand-500', 'bg-brand-50', 'dark:bg-brand-900/20');
+          state.newDate = new Date(el.dataset.iso);
+          await renderTimes();
+        });
+      });
+    }
+
+    async function renderTimes() {
+      show('reschedule-times-section');
+      show('reschedule-times-loading');
+      hide('reschedule-times-empty');
+      $('reschedule-times').innerHTML = '';
+
+      const hours = JSON.parse(state.business.business_hours_json || '{}');
+      const day = hours[dayKey(state.newDate)];
+      const openMin = parseHHMM(day.open);
+      const closeMin = parseHHMM(day.close);
+      const durationMin = state.apptService.duration_minutes;
+      const buffer = state.business.buffer_minutes || 0;
+
+      const dayStart = new Date(state.newDate);
+      dayStart.setHours(0, 0, 0, 0);
+      const dayEnd = new Date(dayStart);
+      dayEnd.setDate(dayEnd.getDate() + 1);
+
+      let appts = [];
+      try {
+        appts = await loadAppointments(
+          state.business.id,
+          dayStart.toISOString(),
+          dayEnd.toISOString(),
+        );
+      } catch (e) {
+        console.warn('Could not load appointments', e);
+      }
+
+      // Exclude OUR appointment from conflict checking — we're moving it
+      const apptRanges = appts
+        .filter(a => a.id !== state.appointment.id)
+        .filter(a => !['cancelled', 'no_show'].includes(a.status))
+        .map(a => ({
+          start: new Date(a.start_time).getTime(),
+          end: new Date(a.end_time).getTime(),
+        }));
+
+      const slots = [];
+      const now = Date.now();
+      for (let m = openMin; m + durationMin <= closeMin; m += SLOT_INCREMENT_MIN) {
+        const start = new Date(dayStart);
+        start.setMinutes(m);
+        const startMs = start.getTime();
+        const endMs = startMs + durationMin * 60_000;
+        if (startMs <= now) continue;
+
+        const bufferMs = buffer * 60_000;
+        const overlaps = apptRanges.some(r =>
+          startMs < r.end + bufferMs && endMs + bufferMs > r.start
+        );
+        if (overlaps) continue;
+
+        slots.push(start);
+      }
+
+      hide('reschedule-times-loading');
+      const list = $('reschedule-times');
+      if (!slots.length) {
+        show('reschedule-times-empty');
+        return;
+      }
+      list.innerHTML = slots.map(s => `
+        <button data-iso="${s.toISOString()}"
+          class="py-2.5 rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-brand-400 text-sm font-medium">
+          ${fmtTime(s)}
+        </button>
+      `).join('');
+      list.querySelectorAll('[data-iso]').forEach(el => {
+        el.addEventListener('click', () => confirmReschedule(new Date(el.dataset.iso)));
+      });
+    }
+
+    async function confirmReschedule(newStart) {
+      const durationMin = state.apptService.duration_minutes;
+      const newEnd = new Date(newStart.getTime() + durationMin * 60_000);
+
+      if (!confirm(`Move your booking to ${fmtDate(newStart)} at ${fmtTime(newStart)}?`)) {
+        return;
+      }
+
+      const url = `${SUPABASE_URL}/rest/v1/appointments` +
+        `?client_token=eq.${encodeURIComponent(state.token)}`;
+      const res = await fetch(url, {
+        method: 'PATCH',
+        headers: { ...HEADERS, 'Content-Type': 'application/json', 'Content-Profile': 'atheos', Prefer: 'return=minimal' },
+        body: JSON.stringify({
+          start_time: newStart.toISOString(),
+          end_time: newEnd.toISOString(),
+          updated_at: new Date().toISOString(),
+        }),
+      });
+
+      if (!res.ok) {
+        alert('Could not reschedule — the slot may have just been taken. Try another.');
+        return;
+      }
+
+      $('rescheduled-detail').textContent =
+        `Your ${state.apptService.service_name_snapshot} is now on ${fmtDate(newStart)} at ${fmtTime(newStart)}.`;
+      hide('view'); hide('reschedule');
+      show('rescheduled');
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // Boot
+    // ──────────────────────────────────────────────────────────
+    async function boot() {
+      const parts = window.location.pathname.split('/').filter(Boolean);
+      state.token = parts[1] || '';
+      if (!state.token) {
+        showError('No booking token in the URL.');
+        return;
+      }
+
+      try {
+        const appt = await loadAppointment();
+        if (!appt) {
+          showError('This booking link is invalid or the appointment has been removed.');
+          return;
+        }
+        state.appointment = appt;
+
+        const [services, biz] = await Promise.all([
+          loadApptServices(appt.id),
+          loadBusiness(appt.business_id),
+        ]);
+        state.apptService = services[0] || null;
+        state.business = biz;
+
+        if (!biz) {
+          showError('Could not load the business. Contact them directly.');
+          return;
+        }
+
+        renderAppointment();
+        hide('loading');
+        show('view');
+
+        $('reschedule-btn').addEventListener('click', showReschedule);
+        $('cancel-btn').addEventListener('click', onCancel);
+      } catch (e) {
+        console.error(e);
+        showError('Something went wrong loading this page.');
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>
