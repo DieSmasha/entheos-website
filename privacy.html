@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Entheos</title>
+  <meta name="description" content="How Entheos collects, uses, and protects your data.">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef7f9',
+              100: '#d5ecf0',
+              200: '#a8d8e2',
+              300: '#72bfcf',
+              400: '#3f9db2',
+              500: '#2B6777',
+              600: '#245768',
+              700: '#1d4553',
+              800: '#17363f',
+              900: '#0f2530',
+            },
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-white dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased">
+
+  <nav class="sticky top-0 z-50 bg-white/80 dark:bg-gray-950/80 backdrop-blur-lg border-b border-gray-200/50 dark:border-gray-800/50">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-3">
+        <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+          <rect x="12" y="16" width="76" height="16" rx="8" class="fill-brand-500"/>
+          <rect x="12" y="42" width="56" height="16" rx="8" class="fill-brand-500"/>
+          <rect x="12" y="68" width="76" height="16" rx="8" class="fill-brand-500"/>
+        </svg>
+        <span class="text-lg font-bold tracking-tight text-brand-500">Entheos</span>
+      </a>
+      <a href="/" class="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-brand-500 transition-colors">← Back to home</a>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-6 py-16">
+    <h1 class="text-4xl font-bold tracking-tight mb-2">Privacy Policy</h1>
+    <p class="text-gray-500 dark:text-gray-400 mb-12">Last updated: April 13, 2026</p>
+
+    <div class="prose prose-gray dark:prose-invert max-w-none space-y-8">
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-3">1. Who we are</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+          Entheos ("we", "our") is a business management app for self-employed service providers.
+          The app is operated out of Canada and this policy applies to the Entheos mobile and desktop
+          apps and the entheosapp.ca website.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-3">2. Information we collect</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-3">
+          Entheos is <strong>offline-first</strong>. Most of your data stays on your device unless you
+          choose to create an account and sync to the cloud.
+        </p>
+        <h3 class="text-lg font-semibold mt-4 mb-2">Data you enter into the app</h3>
+        <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+          <li>Business information (name, owner, province, industry, tax details)</li>
+          <li>Client records (names, contact details, notes, custom fields)</li>
+          <li>Appointments, services, products, expenses, payments, income</li>
+          <li>Receipt photos, mileage logs, and other records you add</li>
+        </ul>
+        <h3 class="text-lg font-semibold mt-4 mb-2">Account data (optional)</h3>
+        <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+          <li>Email address and password (for sign-in)</li>
+          <li>The data above, copied to our server so you can sync across devices</li>
+        </ul>
+        <h3 class="text-lg font-semibold mt-4 mb-2">Phone contacts (only if you import them)</h3>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+          If you use the "Import from Phone Contacts" feature, Entheos reads your device's contact list
+          so you can select which ones to add as clients. We do not upload your full contact list
+          anywhere — only the contacts you explicitly select become clients in your account.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-3">3. How we use your data</h2>
+        <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+          <li>To provide the core app features (scheduling, record-keeping, tax tools)</li>
+          <li>To sync your data between your devices, if you have an account</li>
+          <li>To send you appointment reminder notifications on your own device</li>
+          <li>To secure and back up your account data</li>
+        </ul>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-3">
+          We do <strong>not</strong> sell your data, use it for advertising, or share it with third
+          parties for marketing purposes.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-3">4. Where your data is stored</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+          When you use Entheos without an account, all your data lives on your device. If you create an
+          account, your data is also encrypted in transit (TLS 1.2+) and stored on our Supabase-based
+          backend hosted in Canada. Row-level security ensures only you can read your own records.
+          Receipt photos are stored in a private cloud bucket with per-user access controls.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-3">5. Your rights</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mb-3">
+          You can:
+        </p>
+        <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+          <li>Access, export, or delete any of your data from within the app</li>
+          <li>Delete your account at any time (this removes your data from our servers)</li>
+          <li>Use the app entirely offline without ever creating an account</li>
+          <li>Request a copy of your data or its deletion by emailing us</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-3">6. Permissions we request</h2>
+        <ul class="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+          <li><strong>Camera / Photos</strong>: to capture or choose receipt images (only when you tap the camera button)</li>
+          <li><strong>Contacts</strong>: to import phone contacts as clients (only when you use that feature)</li>
+          <li><strong>Notifications</strong>: to remind you of upcoming appointments</li>
+        </ul>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed mt-3">
+          Each permission is only used for its stated purpose and can be revoked from your device settings.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-3">7. Security</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+          We use industry-standard security measures including encrypted transit (HTTPS/TLS), database-level
+          row security, hashed passwords, and signed URLs for any uploaded files. No system is perfectly
+          secure; if we ever discover a breach affecting your data, we will notify you promptly.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-3">8. Children's privacy</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+          Entheos is designed for self-employed business owners and is not intended for users under 16.
+          We do not knowingly collect personal information from anyone under 16.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-3">9. Changes to this policy</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+          If we materially change this policy, we'll update the "Last updated" date above and, for
+          significant changes, notify you through the app.
+        </p>
+      </section>
+
+      <section>
+        <h2 class="text-2xl font-semibold mb-3">10. Contact</h2>
+        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">
+          Questions, data requests, or concerns? Email
+          <a href="mailto:privacy@entheosapp.ca" class="text-brand-500 hover:underline">privacy@entheosapp.ca</a>.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="py-12 border-t border-gray-200 dark:border-gray-800 mt-16">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <svg width="24" height="24" viewBox="0 0 100 100" fill="none">
+            <rect x="12" y="16" width="76" height="16" rx="8" class="fill-brand-500"/>
+            <rect x="12" y="42" width="56" height="16" rx="8" class="fill-brand-500"/>
+            <rect x="12" y="68" width="76" height="16" rx="8" class="fill-brand-500"/>
+          </svg>
+          <span class="text-sm font-semibold text-brand-500">Entheos</span>
+        </div>
+        <div class="flex gap-6 text-sm text-gray-500 dark:text-gray-400">
+          <a href="/" class="hover:text-brand-500">Home</a>
+          <a href="/privacy.html" class="hover:text-brand-500">Privacy</a>
+          <a href="/terms.html" class="hover:text-brand-500">Terms</a>
+        </div>
+        <p class="text-sm text-gray-400 dark:text-gray-500">
+          &copy; 2026 Entheos. Built in Canada.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
