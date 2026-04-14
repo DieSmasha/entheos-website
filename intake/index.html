@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Intake Form — Entheos</title>
+  <meta name="description" content="Complete your intake form">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'media',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef7f9', 100: '#d5ecf0', 200: '#a8d8e2', 300: '#72bfcf',
+              400: '#3f9db2', 500: '#2B6777', 600: '#245768', 700: '#1d4553',
+              800: '#17363f', 900: '#0f2530',
+            },
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        },
+      },
+    }
+  </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 font-sans antialiased min-h-screen">
+
+  <nav class="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+    <div class="max-w-2xl mx-auto px-6 h-16 flex items-center">
+      <a href="/" class="flex items-center gap-3">
+        <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+          <rect x="12" y="16" width="76" height="16" rx="8" class="fill-brand-500"/>
+          <rect x="12" y="42" width="56" height="16" rx="8" class="fill-brand-500"/>
+          <rect x="12" y="68" width="76" height="16" rx="8" class="fill-brand-500"/>
+        </svg>
+        <span class="text-lg font-bold tracking-tight text-brand-500">Entheos</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="max-w-2xl mx-auto px-6 py-12">
+    <div id="loading" class="text-center py-16">
+      <svg class="animate-spin h-8 w-8 mx-auto text-brand-500" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="mt-4 text-gray-500">Loading form…</p>
+    </div>
+
+    <div id="error" class="hidden bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-6 text-center">
+      <svg class="w-12 h-12 mx-auto text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+      <h2 class="mt-4 text-lg font-semibold text-red-700 dark:text-red-400">Form not found</h2>
+      <p id="error-message" class="mt-2 text-sm text-red-600 dark:text-red-400"></p>
+    </div>
+
+    <div id="form-container" class="hidden bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-8">
+      <h1 id="form-name" class="text-2xl font-bold mb-2"></h1>
+      <p id="form-description" class="text-gray-500 dark:text-gray-400 mb-8"></p>
+
+      <form id="intake-form" class="space-y-6">
+        <!-- Your info section -->
+        <div class="pb-6 border-b border-gray-200 dark:border-gray-800">
+          <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-4">Your Info</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">Name <span class="text-red-500">*</span></label>
+              <input type="text" name="submitter_name" required class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Email</label>
+              <input type="email" name="submitter_email" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Phone</label>
+              <input type="tel" name="submitter_phone" class="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none">
+            </div>
+          </div>
+        </div>
+
+        <div id="questions" class="space-y-6"></div>
+
+        <button type="submit" id="submit-btn" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          Submit
+        </button>
+      </form>
+    </div>
+
+    <div id="success" class="hidden bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 p-8 text-center">
+      <div class="w-16 h-16 mx-auto rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+      </div>
+      <h2 class="mt-6 text-2xl font-bold">Thanks!</h2>
+      <p class="mt-2 text-gray-500 dark:text-gray-400">Your form has been submitted. You'll hear back soon.</p>
+    </div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://db.entheosapp.ca';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiAiSFMyNTYiLCAidHlwIjogIkpXVCJ9.eyJyb2xlIjogImFub24iLCAiaXNzIjogInN1cGFiYXNlIiwgImlhdCI6IDE3NzUwOTU0NTcsICJleHAiOiAyMDkwNDU1NDU3fQ.ZWUzB785p8R-U1eblh2-ewArusRzCKwapJCwSxCTYSM';
+
+    // Extract token from URL path: /intake/{token}
+    const token = window.location.pathname.split('/').filter(Boolean)[1];
+    if (!token) {
+      showError('No form token provided in the URL.');
+    } else {
+      loadForm(token);
+    }
+
+    async function loadForm(token) {
+      try {
+        const url = `${SUPABASE_URL}/rest/v1/intake_forms?token=eq.${encodeURIComponent(token)}&is_active=eq.true&deleted_at=is.null&select=id,name,description,fields_json,business_id&limit=1`;
+        const res = await fetch(url, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Accept-Profile': 'atheos',
+          },
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const rows = await res.json();
+        if (!rows.length) {
+          showError('This form is no longer active or does not exist.');
+          return;
+        }
+        renderForm(rows[0]);
+      } catch (e) {
+        showError(`Could not load form: ${e.message}`);
+      }
+    }
+
+    function showError(msg) {
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('error-message').textContent = msg;
+      document.getElementById('error').classList.remove('hidden');
+    }
+
+    let currentForm = null;
+
+    function renderForm(form) {
+      currentForm = form;
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('form-container').classList.remove('hidden');
+      document.getElementById('form-name').textContent = form.name;
+      document.getElementById('form-description').textContent = form.description || '';
+      if (!form.description) {
+        document.getElementById('form-description').classList.add('hidden');
+      }
+
+      const questionsDiv = document.getElementById('questions');
+      const fields = JSON.parse(form.fields_json);
+
+      fields.forEach(field => {
+        const wrapper = document.createElement('div');
+        const label = document.createElement('label');
+        label.className = 'block text-sm font-medium mb-1';
+        label.innerHTML = field.label + (field.required ? ' <span class="text-red-500">*</span>' : '');
+        wrapper.appendChild(label);
+
+        if (field.helpText) {
+          const help = document.createElement('p');
+          help.className = 'text-xs text-gray-500 dark:text-gray-400 mb-2';
+          help.textContent = field.helpText;
+          wrapper.appendChild(help);
+        }
+
+        wrapper.appendChild(renderInput(field));
+        questionsDiv.appendChild(wrapper);
+      });
+
+      document.getElementById('intake-form').addEventListener('submit', onSubmit);
+    }
+
+    function renderInput(field) {
+      const inputClass = 'w-full px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none';
+      const fieldName = `q_${field.id}`;
+
+      switch (field.type) {
+        case 'text':
+        case 'email':
+        case 'phone':
+        case 'number': {
+          const input = document.createElement('input');
+          input.type = field.type === 'email' ? 'email' : field.type === 'phone' ? 'tel' : field.type === 'number' ? 'number' : 'text';
+          input.name = fieldName;
+          input.className = inputClass;
+          if (field.required) input.required = true;
+          return input;
+        }
+        case 'longText': {
+          const t = document.createElement('textarea');
+          t.name = fieldName;
+          t.rows = 3;
+          t.className = inputClass;
+          if (field.required) t.required = true;
+          return t;
+        }
+        case 'date': {
+          const d = document.createElement('input');
+          d.type = 'date';
+          d.name = fieldName;
+          d.className = inputClass;
+          if (field.required) d.required = true;
+          return d;
+        }
+        case 'boolean': {
+          const wrap = document.createElement('div');
+          wrap.className = 'flex gap-3';
+          ['Yes', 'No'].forEach(label => {
+            const btn = document.createElement('label');
+            btn.className = 'flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800';
+            btn.innerHTML = `<input type="radio" name="${fieldName}" value="${label === 'Yes' ? 'true' : 'false'}" ${field.required ? 'required' : ''} class="text-brand-500"> <span>${label}</span>`;
+            wrap.appendChild(btn);
+          });
+          return wrap;
+        }
+        case 'singleChoice': {
+          const wrap = document.createElement('div');
+          wrap.className = 'space-y-2';
+          (field.options || []).forEach(opt => {
+            const row = document.createElement('label');
+            row.className = 'flex items-center gap-3 px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800';
+            row.innerHTML = `<input type="radio" name="${fieldName}" value="${escapeHtml(opt)}" ${field.required ? 'required' : ''} class="text-brand-500"> <span>${escapeHtml(opt)}</span>`;
+            wrap.appendChild(row);
+          });
+          return wrap;
+        }
+        case 'multiChoice': {
+          const wrap = document.createElement('div');
+          wrap.className = 'space-y-2';
+          wrap.dataset.multi = fieldName;
+          (field.options || []).forEach(opt => {
+            const row = document.createElement('label');
+            row.className = 'flex items-center gap-3 px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800';
+            row.innerHTML = `<input type="checkbox" name="${fieldName}" value="${escapeHtml(opt)}" class="text-brand-500 rounded"> <span>${escapeHtml(opt)}</span>`;
+            wrap.appendChild(row);
+          });
+          return wrap;
+        }
+        default: {
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.name = fieldName;
+          input.className = inputClass;
+          return input;
+        }
+      }
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    async function onSubmit(e) {
+      e.preventDefault();
+      const btn = document.getElementById('submit-btn');
+      btn.disabled = true;
+      btn.textContent = 'Submitting…';
+
+      try {
+        const formData = new FormData(e.target);
+        const fields = JSON.parse(currentForm.fields_json);
+
+        // Build answers object keyed by field id.
+        const answers = {};
+        for (const f of fields) {
+          const key = `q_${f.id}`;
+          if (f.type === 'multiChoice') {
+            answers[f.id] = formData.getAll(key);
+          } else {
+            answers[f.id] = formData.get(key) || '';
+          }
+        }
+
+        const payload = {
+          form_id: currentForm.id,
+          business_id: currentForm.business_id,
+          submitter_name: formData.get('submitter_name'),
+          submitter_email: formData.get('submitter_email') || null,
+          submitter_phone: formData.get('submitter_phone') || null,
+          answers_json: JSON.stringify(answers),
+        };
+
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/intake_submissions`, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Content-Type': 'application/json',
+            'Content-Profile': 'atheos',
+            'Prefer': 'return=minimal',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
+
+        document.getElementById('form-container').classList.add('hidden');
+        document.getElementById('success').classList.remove('hidden');
+      } catch (err) {
+        btn.disabled = false;
+        btn.textContent = 'Submit';
+        alert('Submit failed: ' + err.message);
+      }
+    }
+  </script>
+
+</body>
+</html>
